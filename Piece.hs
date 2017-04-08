@@ -1,7 +1,10 @@
+import Data.List
+
 type InputDir = Float
 type TrackVector = (Float, Float, Float)
 type OutputDir = Float
-data Piece = Piece InputDir TrackVector OutputDir deriving (Show)
+data Piece = Piece InputDir TrackVector OutputDir deriving (Show, Eq)
+data Track = Track [Piece] deriving (Show, Eq)
 
 rotateToAlign (Piece _ _ out_dir1)
               (Piece in_dir2 (x_dir, y_dir, z_dir) out_dir2)
@@ -30,3 +33,7 @@ flipPiece (Piece in_dir (x, y, z) out_dir) = let (rotated_x, rotated_y, rotated_
                                                  flipped_out_dir = (-rotated_out_dir)
                                                  unrotated_out_dir = flipped_out_dir + in_dir in
                                             (Piece in_dir (unrotated_x, unrotated_y, unrotated_z) unrotated_out_dir)
+
+allPossibleTracks (p:[]) = [p]:[flipPiece p]:[]
+allPossibleTracks (p:ps) = let subset = allPossibleTracks ps in
+                         subset ++ (concatMap (\x -> permutations (p:x)) subset) ++ (concatMap (\x -> permutations ((flipPiece p):x)) subset)
