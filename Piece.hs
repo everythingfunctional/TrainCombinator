@@ -37,3 +37,12 @@ flipPiece (Piece in_dir (x, y, z) out_dir) = let (rotated_x, rotated_y, rotated_
 allPossibleTracks (p:[]) = [p]:[flipPiece p]:[]
 allPossibleTracks (p:ps) = let subset = allPossibleTracks ps in
                          subset ++ (concatMap (\x -> permutations (p:x)) subset) ++ (concatMap (\x -> permutations ((flipPiece p):x)) subset)
+
+rotateTrack n (p:[]) = p:[]
+rotateTrack n ps = bs ++ as where (as, bs) = splitAt n ps
+
+
+allRotations p = iter (length p) [] p where
+    iter l xs p
+        | l == 0 = xs
+        | otherwise = iter (l - 1) ((rotateTrack l p):xs) p
