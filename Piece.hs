@@ -13,7 +13,7 @@ rotateToAlign (Piece _ _ out_dir1)
 
 within360 deg
     | deg < 0 = within360 $ deg + 360
-    | deg > 360 = within360 $ deg - 360
+    | deg >= 360 = within360 $ deg - 360
     | otherwise = deg
 
 rotate (x, y, z) rotation = let rot = rotation * pi / 180 in
@@ -50,3 +50,22 @@ tracksEqual (Track t1) (Track t2) = t1 `elem` (allRotations t2)
 
 removeDuplicates (x:xs) = x : (removeDuplicates (filter (\y -> not (tracksEqual x y)) xs))
 removeDuplicates [] = []
+
+tolerance = 0.01
+
+isCircuit (Track t) = ((abs x) < tolerance) && ((abs y) < tolerance) && ((abs z) < tolerance) && ((abs out_angle) < tolerance)
+    where Piece in_angle (x, y, z) out_angle = (foldr appendPieces (Piece 0 (0, 0, 0) 0) t)
+
+corner = Piece 0 (14.1421356237, 5.85786437627, 0) 45
+small_corner = Piece 0 (7.07106781187, 2.92893218813, 0) 45
+--small_corner = Piece 0 (7.42462120246, 3.07537879754, 0) 45
+mini_straight = Piece 0 (5, 0, 0) 0
+small_straight = Piece 0 (10, 0, 0) 0
+straight = Piece 0 (15, 0, 0) 0
+long_straight = Piece 0 (20, 0, 0) 0
+go_up = Piece 0 (20, 0, 6) 0
+go_down = Piece 0 (20, 0, (-6)) 0
+
+inventory = (replicate 8 corner) ++ (replicate 2 small_corner) ++ (replicate 2 mini_straight) ++ (replicate 2 small_straight) ++ (replicate 4 straight) ++ (replicate 2 long_straight) ++ (replicate 1 go_up) ++ (replicate 1 go_down)
+
+allValidTracks ps = (removeDuplicates (filter isCircuit (map Track (allPossibleTracks ps))))
