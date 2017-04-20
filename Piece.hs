@@ -46,4 +46,7 @@ allRotations p = iter (length p) [] p where
         | l == 0 = xs
         | otherwise = iter (l - 1) ((rotateTrack l p):xs) p
 
-tracksEqual t1 t2 = t1 `elem` (allRotations t2)
+tracksEqual (Track t1) (Track t2) = t1 `elem` (allRotations t2)
+
+removeDuplicates (x:xs) = x : (removeDuplicates (filter (\y -> not (tracksEqual x y)) xs))
+removeDuplicates [] = []
