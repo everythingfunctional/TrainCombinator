@@ -1,10 +1,11 @@
+{-# OPTIONS_GHC -O -fglasgow-exts #-}
 import Data.List
 
 type InputDir = Float
 type TrackVector = (Float, Float, Float)
 type OutputDir = Float
 data Piece = Piece InputDir TrackVector OutputDir deriving (Show, Eq)
-data Track = Track [Piece] deriving (Show, Eq)
+type Track = [Piece]
 
 rotateToAlign (Piece _ _ out_dir1)
               (Piece in_dir2 (x_dir, y_dir, z_dir) out_dir2)
@@ -46,15 +47,17 @@ allRotations p = iter (length p) [] p where
         | l == 0 = xs
         | otherwise = iter (l - 1) ((rotateTrack l p):xs) p
 
-tracksEqual (Track t1) (Track t2) = t1 `elem` (allRotations t2)
+tracksEqual t1 t2 = t1 `elem` (allRotations t2)
 
 removeDuplicates (x:xs) = x : (removeDuplicates (filter (\y -> not (tracksEqual x y)) xs))
 removeDuplicates [] = []
 
 tolerance = 0.01
 
-isCircuit (Track t) = ((abs x) < tolerance) && ((abs y) < tolerance) && ((abs z) < tolerance) && ((abs out_angle) < tolerance)
+isCircuit t = ((abs x) < tolerance) && ((abs y) < tolerance) && ((abs z) < tolerance) && ((abs out_angle) < tolerance)
     where Piece in_angle (x, y, z) out_angle = (foldr appendPieces (Piece 0 (0, 0, 0) 0) t)
+
+allValidTracks ps = (removeDuplicates (filter isCircuit (allPossibleTracks ps)))
 
 corner = Piece 0 (14.1421356237, 5.85786437627, 0) 45
 small_corner = Piece 0 (7.07106781187, 2.92893218813, 0) 45
@@ -68,8 +71,6 @@ go_down = Piece 0 (20, 0, (-6)) 0
 
 --inventory = (replicate 8 corner) ++ (replicate 2 small_corner) ++ (replicate 2 mini_straight) ++ (replicate 2 small_straight) ++ (replicate 4 straight) ++ (replicate 2 long_straight) ++ (replicate 1 go_up) ++ (replicate 1 go_down)
 inventory = (replicate 8 corner)
-
-allValidTracks ps = (removeDuplicates (filter isCircuit (map Track (allPossibleTracks ps))))
 
 main = do let tracks = allValidTracks inventory in
             putStrLn (unlines (map show tracks))
