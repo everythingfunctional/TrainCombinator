@@ -66,6 +66,10 @@ long_straight = Piece 0 (20, 0, 0) 0
 go_up = Piece 0 (20, 0, 6) 0
 go_down = Piece 0 (20, 0, (-6)) 0
 
-inventory = (replicate 8 corner) ++ (replicate 2 small_corner) ++ (replicate 2 mini_straight) ++ (replicate 2 small_straight) ++ (replicate 4 straight) ++ (replicate 2 long_straight) ++ (replicate 1 go_up) ++ (replicate 1 go_down)
+--inventory = (replicate 8 corner) ++ (replicate 2 small_corner) ++ (replicate 2 mini_straight) ++ (replicate 2 small_straight) ++ (replicate 4 straight) ++ (replicate 2 long_straight) ++ (replicate 1 go_up) ++ (replicate 1 go_down)
+inventory = (replicate 8 corner)
 
 allValidTracks ps = (removeDuplicates (filter isCircuit (map Track (allPossibleTracks ps))))
+
+main = do let tracks = allValidTracks inventory in
+            putStrLn (unlines (map show tracks))
