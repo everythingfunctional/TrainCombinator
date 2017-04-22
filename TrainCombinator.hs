@@ -42,10 +42,10 @@ allPossibleTracks (p:ps) = let subset = allPossibleTracks ps in
 rotateTrack n (p:[]) = p:[]
 rotateTrack n ps = bs ++ as where (as, bs) = splitAt n ps
 
-allRotations p = iter (length p) [] p where
-    iter l xs p
-        | l == 0 = xs
-        | otherwise = iter (l - 1) ((rotateTrack l p):xs) p
+allRotations p = p:iter 1 where
+                    iter i
+                        | i >= length p = []
+                        | otherwise = (rotateTrack i p):(iter (i + 1))
 
 tracksEqual t1 t2 = t1 `elem` (allRotations t2)
 
