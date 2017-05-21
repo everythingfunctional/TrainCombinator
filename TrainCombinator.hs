@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -O -fglasgow-exts #-}
 import Data.List
+import Control.Parallel
 
 type InputDir = Float
 type TrackVector = (Float, Float, Float)
@@ -36,8 +37,11 @@ flipPiece (Piece in_dir (x, y, z) out_dir) = let (rotated_x, rotated_y, rotated_
                                             (Piece in_dir (unrotated_x, unrotated_y, unrotated_z) unrotated_out_dir)
 
 allPossibleTracks (p:[]) = [p]:[flipPiece p]:[]
-allPossibleTracks (p:ps) = let subset = allPossibleTracks ps in
-                         subset ++ (concatMap (\x -> permutations (p:x)) subset) ++ (concatMap (\x -> permutations ((flipPiece p):x)) subset)
+allPossibleTracks (p:ps) = par without_p (pseq with_p (without_p ++ with_p))
+    where without_p = allPossibleTracks ps
+          with_p = par reversed_p (pseq normal_p (reversed_p ++ normal_p))
+            where reversed_p = (concatMap (\x -> permutations ((flipPiece p):x)) without_p)
+                  normal_p = (concatMap (\x -> permutations (p:x)) without_p)
 
 rotateTrack n (p:[]) = p:[]
 rotateTrack n ps = bs ++ as where (as, bs) = splitAt n ps
