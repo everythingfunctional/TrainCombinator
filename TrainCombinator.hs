@@ -37,7 +37,7 @@ flipPiece (Piece in_dir (x, y, z) out_dir) = let (rotated_x, rotated_y, rotated_
 
 allPossibleTracks (p:[]) = [p]:[flipPiece p]:[]
 allPossibleTracks (p:ps) = let subset = allPossibleTracks ps in
-                         removeDuplicates (subset ++ (concatMap (\x -> permutations (p:x)) subset) ++ (concatMap (\x -> permutations ((flipPiece p):x)) subset))
+                         subset ++ (concatMap (\x -> permutations (p:x)) subset) ++ (concatMap (\x -> permutations ((flipPiece p):x)) subset)
 
 rotateTrack n (p:[]) = p:[]
 rotateTrack n ps = bs ++ as where (as, bs) = splitAt n ps
@@ -57,7 +57,7 @@ tolerance = 0.01
 isCircuit t = ((abs x) < tolerance) && ((abs y) < tolerance) && ((abs z) < tolerance) && ((abs out_angle) < tolerance)
     where Piece in_angle (x, y, z) out_angle = (foldr appendPieces (Piece 0 (0, 0, 0) 0) t)
 
-allValidTracks ps = filter isCircuit (allPossibleTracks ps)
+allValidTracks ps = (removeDuplicates (filter isCircuit (allPossibleTracks ps)))
 
 corner = Piece 0 (14.1421356237, 5.85786437627, 0) 45
 small_corner = Piece 0 (7.07106781187, 2.92893218813, 0) 45
